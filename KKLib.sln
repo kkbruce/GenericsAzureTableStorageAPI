@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKLib", "KKLib\KKLib.csproj", "{09BE351A-2202-479E-A998-E77CC7B523B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKLib.Tests", "KKLib.Tests\KKLib.Tests.csproj", "{282CEFCD-5FAE-4C97-8A08-C237F2A00CEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09BE351A-2202-479E-A998-E77CC7B523B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09BE351A-2202-479E-A998-E77CC7B523B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09BE351A-2202-479E-A998-E77CC7B523B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09BE351A-2202-479E-A998-E77CC7B523B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{282CEFCD-5FAE-4C97-8A08-C237F2A00CEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{282CEFCD-5FAE-4C97-8A08-C237F2A00CEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{282CEFCD-5FAE-4C97-8A08-C237F2A00CEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{282CEFCD-5FAE-4C97-8A08-C237F2A00CEB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
