@@ -237,16 +237,8 @@ namespace KKLib
         private TableResult GetServerTableResult(T tableData)
         {
             TableOperation retrieveOperation = TableOperation.Retrieve<T>(tableName, tableData.RowKey.ToString());
-            try
-            {
-                TableResult retrievedResult = table.Execute(retrieveOperation);
-                return retrievedResult;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-
+            TableResult retrievedResult = table.Execute(retrieveOperation);
+            return retrievedResult;
         }
     }
 }
