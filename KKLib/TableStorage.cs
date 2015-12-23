@@ -13,6 +13,7 @@ namespace KKLib
     {
         private string tableConn;
         private string tableName;
+        private string partitionKey;
         private CloudTable table;
 
         /// <summary>
@@ -20,10 +21,11 @@ namespace KKLib
         /// </summary>
         /// <param name="tableConn">連線字串</param>
         /// <param name="tableName">存取表格名稱</param>
-        public TableStorage(string tableConn, string tableName)
+        public TableStorage(string tableConn, string tableName, string partitionKey = null)
         {
             this.tableConn = tableConn;
             this.tableName = tableName;
+            this.partitionKey = partitionKey;
 
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(tableConn);
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
@@ -132,7 +134,7 @@ namespace KKLib
         public IEnumerable<T> GetAll()
         {
             TableQuery<T> query = new TableQuery<T>().Where(
-                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, tableName));
+                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
             return table.ExecuteQuery(query);
         }
 
@@ -163,7 +165,7 @@ namespace KKLib
         {
             TableQuery<T> rangeQuery = new TableQuery<T>().Where(
                 TableQuery.CombineFilters(
-                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, tableName),
+                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey),
                     TableOperators.And,
                     TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.LessThan, rowkey)));
 
@@ -236,7 +238,7 @@ namespace KKLib
         /// <returns></returns>
         private TableResult GetServerTableResult(T tableData)
         {
-            TableOperation retrieveOperation = TableOperation.Retrieve<T>(tableName, tableData.RowKey.ToString());
+            TableOperation retrieveOperation = TableOperation.Retrieve<T>(tableData.PartitionKey, tableData.RowKey.ToString());
             TableResult retrievedResult = table.Execute(retrieveOperation);
             return retrievedResult;
         }

@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace KKLib.Tests
@@ -23,6 +24,8 @@ namespace KKLib.Tests
         [TearDown()]
         public void Cleanup()
         {
+            var table = new TableStorage<TestEntity>(tableConn, tableName);
+            table.DeleteTable();
         }
 
         [Test()]
@@ -76,41 +79,52 @@ namespace KKLib.Tests
         [Test()]
         public void GetAll_取回所有實體集合()
         {
-            var table = new TableStorage<TestEntity>(tableConn, tableName);
-            var datas = table.GetAll();
+            var expected = 3;
 
-            CollectionAssert.AllItemsAreInstancesOfType(datas, typeof(TestEntity));
+            TableStorage<TestEntity> table;
+            AddTest(out table);
+            var datas  = table.GetAll();
+
+            Assert.AreEqual(expected, datas.Count());
         }
 
         [Test()]
         public void GetAllAsync_非同步取回所有實體集合()
         {
-            var table = new TableStorage<TestEntity>(tableConn, tableName);
+            var expected = 3;
+
+            TableStorage<TestEntity> table;
+            AddTest(out table);
             var datas = table.GetAllAsync();
 
-            CollectionAssert.AllItemsAreInstancesOfType(datas.Result, typeof(TestEntity));
+            Assert.AreEqual(expected, datas.Result.Count());
         }
 
         [Test()]
         public void GetRange_取回某一Rowkey區間實體集合()
         {
+            var expected = 3;
 
-            var table = new TableStorage<TestEntity>(tableConn, tableName);
-            var datas = table.GetRange("a");
+            TableStorage<TestEntity> table;
+            AddTest(out table);
+            // 小於的比較 "b"atch，所以取 "c"
+            var datas = table.GetRange("c");
 
-            CollectionAssert.AllItemsAreInstancesOfType(datas, typeof(TestEntity));
+            Assert.AreEqual(expected, datas.Count());
         }
 
         [Test()]
         public void GetSingle_取回單一實體()
         {
-            var data = new TestEntity(partitionKey, "batch1");
+            var expected = "Batch Test Data 1.";
 
-            var table = new TableStorage<TestEntity>(tableConn, tableName);
+            TableStorage<TestEntity> table;
+            AddTest(out table);
+
+            var data = new TestEntity(partitionKey, "batch1");
             var actual = table.GetSingle(data);
 
-            Assert.IsNotNull(actual);
-            StringAssert.Contains("Test", actual.Value);
+            Assert.AreEqual(expected, actual.Value);
         }
 
         [Test()]
@@ -119,7 +133,8 @@ namespace KKLib.Tests
             var data = new TestEntity(partitionKey, "batch1");
             var expected = "OK";
 
-            var table = new TableStorage<TestEntity>(tableConn, tableName);
+            TableStorage<TestEntity> table;
+            AddTest(out table);
             var actual = table.Delete(data);
 
             Assert.AreEqual(expected, actual);
@@ -134,6 +149,19 @@ namespace KKLib.Tests
             var actual = table.DeleteTable();
 
             Assert.AreEqual(expected, actual);
+        }
+
+        private void AddTest(out TableStorage<TestEntity> table)
+        {
+            var data1 = new TestEntity(partitionKey, "batch1") { Value = "Batch Test Data 1." };
+            var data2 = new TestEntity(partitionKey, "batch2") { Value = "Batch Test Data 2." };
+            var data3 = new TestEntity(partitionKey, "batch3") { Value = "Batch Test Data 3." };
+            List<TestEntity> datas = new List<TestEntity>();
+            datas.Add(data1);
+            datas.Add(data2);
+            datas.Add(data3);
+            table = new TableStorage<TestEntity>(tableConn, tableName, partitionKey);
+            table.BatchInsert(datas);
         }
     }
 
