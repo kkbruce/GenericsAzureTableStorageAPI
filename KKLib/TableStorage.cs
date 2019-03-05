@@ -2,6 +2,7 @@
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace KKLib
@@ -104,13 +105,20 @@ namespace KKLib
 
         /// <summary>
         /// 批次新增資料至Table儲存區。
+        /// 注意：單一批次作業最多可包含 100 個實體。
         /// </summary>
         /// <param name="entities">欲快取的集合</param>
         /// <returns></returns>
         public string BatchInsert(IEnumerable<T> entities)
         {
+            var tableEntities = entities.ToList();
+            if (tableEntities.Count() > 100)
+            {
+                throw new ArgumentOutOfRangeException(nameof(entities), "A single batch operation can include up to 100 entities.");
+            }
+
             TableBatchOperation batchOperation = new TableBatchOperation();
-            foreach (var cache in entities)
+            foreach (var cache in tableEntities)
             {
                 batchOperation.Insert(cache);
             }

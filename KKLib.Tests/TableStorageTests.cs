@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -17,8 +18,8 @@ namespace KKLib.Tests
         {
             //!++執行測試前，請先啟動本機儲存體模擬器
             this.tableConn = "UseDevelopmentStorage=true";
-            this.tableName = "itest";
-            this.partitionKey = "testPK";
+            this.tableName = "testTable";
+            this.partitionKey = "testKey";
         }
 
         [TearDown()]
@@ -59,7 +60,7 @@ namespace KKLib.Tests
         }
 
         [Test()]
-        public void Insert_進行Batch插入_應取得OK回應()
+        public void Insert_進行BatchInsert_應取得OK回應()
         {
             var data1 = new TestEntity(partitionKey, "batch1") { Value = "Batch Test Data 1." };
             var data2 = new TestEntity(partitionKey, "batch2") { Value = "Batch Test Data 2." };
@@ -74,6 +75,29 @@ namespace KKLib.Tests
             var actual = table.BatchInsert(datas);
 
             Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// Ref https://docs.microsoft.com/zh-tw/azure/cosmos-db/table-storage-how-to-use-dotnet#insert-a-batch-of-entities
+        /// </summary>
+        [Test()]
+        public void Insert_產生超過100實體進行BatchInsert_應取得例外回應()
+        {
+            // C# 7 Support
+            void Validate()
+            {
+                var data = new List<TestEntity>();
+                for (int i = 1; i <= 101; i++)
+                {
+                    var testEntity = new TestEntity(partitionKey, i.ToString()) { Value = i.ToString() };
+                    data.Add(testEntity);
+                }
+
+                var table = new TableStorage<TestEntity>(tableConn, tableName);
+                var actual = table.BatchInsert(data);
+            }
+
+            Assert.Throws(typeof(ArgumentOutOfRangeException), Validate);
         }
 
         [Test()]
